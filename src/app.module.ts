@@ -3,8 +3,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AiosellModule } from './aiosell/aiosell.module';
-import { TestController } from './test-controller/test.controller';
-import { RateConsumer } from './consumers/rate.consumer'; 
+import { TestController } from './controller/api.controller';
+import { RateConsumer } from './consumers/rate.consumer';
 
 @Module({
   imports: [
@@ -19,8 +19,10 @@ import { RateConsumer } from './consumers/rate.consumer';
           client: {
             clientId: 'aiosell-adapter',
             brokers: ['localhost:9092'], // Local Kafka
-            // When deploying to AWS MSK, change this to:
-            // brokers: ['b-1.msk-cluster.aws.com:9092', 'b-2.msk-cluster.aws.com:9092'],
+            retry: {
+              retries: 3,
+              restartOnFailure: async () => true,
+            }
           },
           consumer: {
             groupId: 'aiosell-adapter-group', // All instances share this group ID
@@ -36,4 +38,4 @@ import { RateConsumer } from './consumers/rate.consumer';
   controllers: [TestController, RateConsumer], // Add RateConsumer here
   providers: [],
 })
-export class AppModule {}
+export class AppModule { }

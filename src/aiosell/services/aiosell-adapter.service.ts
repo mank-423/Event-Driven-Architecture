@@ -8,6 +8,7 @@ import { InternalInventoryRestrictionPushDto, InternalRateRestrictionPushDto } f
 import { InternalFetchDto } from '../dto/internal-fetch.dto';
 import { InternalInventoryPushDto } from '../dto/internal-inventory.dto';
 import { InternalNoShowDto } from '../dto/internal-noshow.dto';
+import { InternalPropertyDetailsDto } from '../dto/internal-property-details';
 
 @Injectable()
 export class AiosellAdapterService implements IChannelManagerAdapter {
@@ -197,6 +198,30 @@ export class AiosellAdapterService implements IChannelManagerAdapter {
             throw new InternalServerErrorException(response.data.message);
         } catch (error: any) {
             const errorMsg = error.response?.data?.message || error.message;
+            throw new InternalServerErrorException(`Aiosell Error: ${errorMsg}`);
+        }
+    }
+
+    async fetchPropertyDetails(payload: InternalPropertyDetailsDto): Promise<any> {
+        const url = `${this.baseUrl}/property_details/${payload.hotelId}?partnerId=${payload.partnerId}`;
+
+        try {
+            const response = await firstValueFrom(
+                this.httpService.get(url,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: this.authHeader,
+                        },
+                        timeout: 10000,
+                    }
+                )
+            )
+
+            return response.data;
+        } catch (error: any) {
+            const errorMsg = error.response?.data?.message || error.message;
+            console.error('Aiosell property details fetch failed:', errorMsg);
             throw new InternalServerErrorException(`Aiosell Error: ${errorMsg}`);
         }
     }

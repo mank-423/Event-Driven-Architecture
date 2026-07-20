@@ -1,12 +1,13 @@
-import { Controller, Post, Body, HttpCode } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, Get, Query } from '@nestjs/common';
 import { AiosellAdapterService } from '../aiosell/services/aiosell-adapter.service';
 import { InternalRatePushPayloadDto } from '../aiosell/dto/internal-rate.dto';
 import { InternalInventoryPushDto } from 'src/aiosell/dto/internal-inventory.dto';
 import { InternalInventoryRestrictionPushDto, InternalRateRestrictionPushDto } from 'src/aiosell/dto/internal-restrictions.dto';
 import { InternalFetchDto } from 'src/aiosell/dto/internal-fetch.dto';
 import { InternalNoShowDto } from 'src/aiosell/dto/internal-noshow.dto';
+import { InternalPropertyDetailsDto } from 'src/aiosell/dto/internal-property-details';
 
-@Controller('test')
+@Controller('api')
 export class TestController {
     constructor(private readonly aiosellService: AiosellAdapterService) { }
 
@@ -58,5 +59,11 @@ export class TestController {
     @HttpCode(200)
     async testNoShow(@Body() payload: InternalNoShowDto) {
         return await this.aiosellService.pushNoShow(payload);
+    }
+
+    @Get('property-details')
+    @HttpCode(200)
+    async testFetchPropertyDetails(@Query() payload: InternalPropertyDetailsDto){
+        return await this.aiosellService.fetchPropertyDetails(payload);
     }
 }
