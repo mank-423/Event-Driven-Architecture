@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ClientsModule } from '@nestjs/microservices';
 import { AiosellModule } from './aiosell/aiosell.module';
-import { TestController } from './controller/api.controller';
+import { AppController, TestController } from './controller/api.controller';
 import { getKafkaConfig } from './config/kafka.config'; // 👈 Import helper
 
 // Import all Kafka consumers
@@ -28,6 +28,7 @@ import { KafkaGatewayController } from './controller/kafka-gateway.controller';
     AiosellModule,
   ],
   controllers: [
+    AppController,
     TestController,
     KafkaGatewayController,
     RateConsumer,
