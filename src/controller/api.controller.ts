@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpCode, Get, Query } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, Get, Query, HttpStatus } from '@nestjs/common';
 import { AiosellAdapterService } from '../aiosell/services/aiosell-adapter.service';
 import { InternalRatePushPayloadDto } from '../aiosell/dto/internal-rate.dto';
 import { InternalInventoryPushDto } from 'src/aiosell/dto/internal-inventory.dto';
@@ -6,6 +6,17 @@ import { InternalInventoryRestrictionPushDto, InternalRateRestrictionPushDto } f
 import { InternalFetchDto } from 'src/aiosell/dto/internal-fetch.dto';
 import { InternalNoShowDto } from 'src/aiosell/dto/internal-noshow.dto';
 import { InternalPropertyDetailsDto } from 'src/aiosell/dto/internal-property-details';
+
+@Controller()
+export class AppController {
+  @Get()
+  getHello() {
+    return {
+      status: HttpStatus.OK,
+      message: 'API is running!',
+    };
+  }
+}
 
 @Controller('api')
 export class TestController {
