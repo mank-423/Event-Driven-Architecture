@@ -6,6 +6,7 @@ import { InternalInventoryRestrictionPushDto, InternalRateRestrictionPushDto } f
 import { InternalFetchDto } from 'src/aiosell/dto/internal-fetch.dto';
 import { InternalNoShowDto } from 'src/aiosell/dto/internal-noshow.dto';
 import { InternalPropertyDetailsDto } from 'src/aiosell/dto/internal-property-details';
+import { RateLimiterService } from 'src/rate-limiter/rate-limiter.service';
 
 @Controller()
 export class AppController {
@@ -20,7 +21,10 @@ export class AppController {
 
 @Controller('api')
 export class TestController {
-    constructor(private readonly aiosellService: AiosellAdapterService) { }
+    constructor(
+        private readonly aiosellService: AiosellAdapterService,
+        private readonly rateLimiter: RateLimiterService,
+    ) { }
 
     @Post('push-rates')
     @HttpCode(200)
