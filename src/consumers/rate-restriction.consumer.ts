@@ -1,11 +1,11 @@
 import { Controller } from '@nestjs/common';
 import { EventPattern, Payload, Ctx, KafkaContext } from '@nestjs/microservices';
-import { AiosellAdapterService } from '../aiosell/services/aiosell-adapter.service';
-import { InternalRateRestrictionPushDto } from '../aiosell/dto/internal-restrictions.dto';
+import { providerAdapterService } from '../provider/services/provider-adapter.service';
+import { InternalRateRestrictionPushDto } from '../provider/dto/internal-restrictions.dto';
 
 @Controller()
 export class RateRestrictionConsumer {
-  constructor(private readonly aiosellService: AiosellAdapterService) {}
+  constructor(private readonly providerService: providerAdapterService) {}
 
   @EventPattern('rate-restrictions')
   async handleRateRestriction(@Payload() message: any, @Ctx() context: KafkaContext) {
@@ -21,9 +21,9 @@ export class RateRestrictionConsumer {
       console.log(`[RateRestrictionConsumer] Received rate restriction for hotel: ${payload.hotelId}`);
       console.log(`[RateRestrictionConsumer] Channels: ${payload.toChannels.join(', ')}`);
 
-      const result = await this.aiosellService.pushRateRestrictions(payload);
+      const result = await this.providerService.pushRateRestrictions(payload);
 
-      console.log(`[RateRestrictionConsumer] Successfully pushed rate restrictions to Aiosell`);
+      console.log(`[RateRestrictionConsumer] Successfully pushed rate restrictions to provider`);
       return result;
     } catch (error: any) {
       console.error(`[RateRestrictionConsumer] Failed to process rate restrictions: ${error.message}`);

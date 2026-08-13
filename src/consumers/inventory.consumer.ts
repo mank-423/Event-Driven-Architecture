@@ -1,11 +1,11 @@
 import { Controller } from '@nestjs/common';
 import { EventPattern, Payload, Ctx, KafkaContext } from '@nestjs/microservices';
-import { AiosellAdapterService } from '../aiosell/services/aiosell-adapter.service';
-import { InternalInventoryPushDto } from '../aiosell/dto/internal-inventory.dto';
+import { providerAdapterService } from '../provider/services/provider-adapter.service';
+import { InternalInventoryPushDto } from '../provider/dto/internal-inventory.dto';
 
 @Controller()
 export class InventoryConsumer {
-  constructor(private readonly aiosellService: AiosellAdapterService) {}
+  constructor(private readonly providerService: providerAdapterService) {}
 
   @EventPattern('inventory-updates')
   async handleInventoryUpdate(@Payload() message: any, @Ctx() context: KafkaContext) {
@@ -21,9 +21,9 @@ export class InventoryConsumer {
       console.log(`📥 [InventoryConsumer] Received inventory update for hotel: ${payload.hotelId}`);
       console.log(`📦 [InventoryConsumer] Batch size: ${payload.updates.length} date ranges`);
 
-      const result = await this.aiosellService.pushInventory(payload);
+      const result = await this.providerService.pushInventory(payload);
 
-      console.log(`✅ [InventoryConsumer] Successfully pushed inventory to Aiosell`);
+      console.log(`✅ [InventoryConsumer] Successfully pushed inventory to provider`);
       return result;
     } catch (error: any) {
       console.error(`❌ [InventoryConsumer] Failed to process inventory: ${error.message}`);

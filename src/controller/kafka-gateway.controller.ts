@@ -1,12 +1,12 @@
 import { Controller, Post, Body, HttpCode, Inject } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
-import { InternalRatePushPayloadDto } from '../aiosell/dto/internal-rate.dto';
-import { InternalInventoryPushDto } from '../aiosell/dto/internal-inventory.dto';
+import { InternalRatePushPayloadDto } from '../provider/dto/internal-rate.dto';
+import { InternalInventoryPushDto } from '../provider/dto/internal-inventory.dto';
 import { 
   InternalInventoryRestrictionPushDto, 
   InternalRateRestrictionPushDto 
-} from '../aiosell/dto/internal-restrictions.dto';
-import { InternalNoShowDto } from '../aiosell/dto/internal-noshow.dto';
+} from '../provider/dto/internal-restrictions.dto';
+import { InternalNoShowDto } from '../provider/dto/internal-noshow.dto';
 import { RateLimiterService } from 'src/rate-limiter/rate-limiter.service';
 
 @Controller('kafka')  // Endpoint: /kafka

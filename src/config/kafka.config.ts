@@ -7,7 +7,7 @@ export const getKafkaConfig = (): KafkaOptions => {
     transport: Transport.KAFKA,
     options: {
       client: {
-        clientId: 'aiosell-adapter',
+        clientId: 'provider-adapter',
         brokers: [process.env.KAFKA_BROKER || 'localhost:9092'],
         ssl: isCloud,
         sasl: isCloud
@@ -23,7 +23,7 @@ export const getKafkaConfig = (): KafkaOptions => {
         },
       },
       consumer: {
-        groupId: 'aiosell-adapter-group',
+        groupId: 'provider-adapter-group',
         maxWaitTimeInMs: 1000,
       },
     },

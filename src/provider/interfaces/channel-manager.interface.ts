@@ -1,4 +1,3 @@
-// src/aiosell/interfaces/channel-manager.interface.ts
 import { InternalRatePushPayloadDto } from '../dto/internal-rate.dto';
 import { InternalInventoryPushDto } from '../dto/internal-inventory.dto';
 import { InternalInventoryRestrictionPushDto, InternalRateRestrictionPushDto } from '../dto/internal-restrictions.dto';

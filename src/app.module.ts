@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ClientsModule } from '@nestjs/microservices';
-import { AiosellModule } from './aiosell/aiosell.module';
+import { providerModule } from './provider/provider.module';
 import { AppController, TestController } from './controller/api.controller';
 import { getKafkaConfig } from './config/kafka.config';
 
@@ -29,7 +29,7 @@ import { DebugController } from './controller/debug.controller';
         useFactory: () => getKafkaConfig(),
       },
     ]),
-    AiosellModule,
+    providerModule,
     RedisModule,
     RateLimiterModule,
   ],

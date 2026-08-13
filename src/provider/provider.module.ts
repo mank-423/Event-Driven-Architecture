@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { ConfigModule } from '@nestjs/config';
-import { AiosellAdapterService } from './services/aiosell-adapter.service';
+import { providerAdapterService } from './services/provider.adapter.service';
 
 @Module({
   imports: [
@@ -12,12 +12,12 @@ import { AiosellAdapterService } from './services/aiosell-adapter.service';
     ConfigModule,
   ],
   providers: [
-    AiosellAdapterService,
+    providerAdapterService,
     {
       provide: 'IChannelManagerAdapter', // Token for Dependency Injection
-      useClass: AiosellAdapterService,
+      useClass: providerAdapterService,
     },
   ],
-  exports: [AiosellAdapterService, 'IChannelManagerAdapter'],
+  exports: [providerAdapterService, 'IChannelManagerAdapter'],
 })
-export class AiosellModule {}
+export class providerModule {}

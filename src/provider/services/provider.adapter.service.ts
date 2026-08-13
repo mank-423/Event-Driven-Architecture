@@ -11,7 +11,7 @@ import { InternalNoShowDto } from '../dto/internal-noshow.dto';
 import { InternalPropertyDetailsDto } from '../dto/internal-property-details';
 
 @Injectable()
-export class AiosellAdapterService implements IChannelManagerAdapter {
+export class providerAdapterService implements IChannelManagerAdapter {
     private readonly baseUrl: string;
     private readonly partnerId: string;
     private readonly authHeader: string;
@@ -20,19 +20,19 @@ export class AiosellAdapterService implements IChannelManagerAdapter {
         private readonly httpService: HttpService,
         private readonly configService: ConfigService,
     ) {
-        this.baseUrl = this.configService.get<string>('AIOSELL_BASE_URL')!;
-        this.partnerId = this.configService.get<string>('AIOSELL_PARTNER_ID')!;
+        this.baseUrl = this.configService.get<string>('provider_BASE_URL')!;
+        this.partnerId = this.configService.get<string>('provider_PARTNER_ID')!;
 
-        const username = this.configService.get<string>('AIOSELL_USERNAME')!;
-        const password = this.configService.get<string>('AIOSELL_PASSWORD')!;
+        const username = this.configService.get<string>('provider_USERNAME')!;
+        const password = this.configService.get<string>('provider_PASSWORD')!;
         this.authHeader = `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`;
     }
 
     async pushRates(internalPayload: InternalRatePushPayloadDto): Promise<any> {
         // 1. 🔥 THE MAPPING LAYER (Key Renaming & Restructuring) 🔥
         // Since we have NoDB, we assume the Main PMS sent the correct ID values.
-        // We just reshape the object to match Aiosell's exact spec.
-        const aiosellPayload = {
+        // We just reshape the object to match provider's exact spec.
+        const providerPayload = {
             hotelCode: internalPayload.hotelId, // hotelId → hotelCode
             updates: internalPayload.updates.map((dateRange) => ({
                 startDate: dateRange.startDate,
@@ -50,7 +50,7 @@ export class AiosellAdapterService implements IChannelManagerAdapter {
 
         try {
             const response = await firstValueFrom(
-                this.httpService.post(url, aiosellPayload, {
+                this.httpService.post(url, providerPayload, {
                     headers: {
                         'Content-Type': 'application/json',
                         Authorization: this.authHeader,
@@ -66,14 +66,14 @@ export class AiosellAdapterService implements IChannelManagerAdapter {
             }
         } catch (error: any) {
             const errorMsg = error.response?.data?.message || error.message;
-            console.error('Aiosell API call failed:', errorMsg);
-            throw new InternalServerErrorException(`Aiosell Error: ${errorMsg}`);
+            console.error('provider API call failed:', errorMsg);
+            throw new InternalServerErrorException(`provider Error: ${errorMsg}`);
         }
     }
 
     async pushInventory(internalPayload: InternalInventoryPushDto): Promise<any> {
         // Map: hotelId → hotelCode, roomId → roomCode, available → available (same)
-        const aiosellPayload = {
+        const providerPayload = {
             hotelCode: internalPayload.hotelId,
             updates: internalPayload.updates.map((dateRange) => ({
                 startDate: dateRange.startDate,
@@ -84,12 +84,12 @@ export class AiosellAdapterService implements IChannelManagerAdapter {
                 })),
             })),
         };
-        return this.executePost('/update', aiosellPayload);
+        return this.executePost('/update', providerPayload);
     }
 
     async pushInventoryRestrictions(payload: InternalInventoryRestrictionPushDto): Promise<any> {
         // Map: hotelId → hotelCode
-        const aiosellPayload = {
+        const providerPayload = {
             hotelCode: payload.hotelId,
             toChannels: payload.toChannels,
             updates: payload.updates.map((dateRange) => ({
@@ -101,11 +101,11 @@ export class AiosellAdapterService implements IChannelManagerAdapter {
                 })),
             })),
         };
-        return this.executePost('/update', aiosellPayload);
+        return this.executePost('/update', providerPayload);
     }
 
     async pushRateRestrictions(payload: InternalRateRestrictionPushDto): Promise<any> {
-        const aiosellPayload = {
+        const providerPayload = {
             hotelCode: payload.hotelId,
             toChannels: payload.toChannels,
             updates: payload.updates.map((dateRange) => ({
@@ -118,53 +118,53 @@ export class AiosellAdapterService implements IChannelManagerAdapter {
                 })),
             })),
         };
-        return this.executePost('/update-rates', aiosellPayload);
+        return this.executePost('/update-rates', providerPayload);
     }
 
     // --- FETCH METHODS (The 'type' mapping) ---
     async fetchInventory(payload: InternalFetchDto): Promise<any> {
         // Map: hotelId → hotelCode, 'inventory' type
-        const aiosellPayload = {
+        const providerPayload = {
             type: 'inventory',
             hotelCode: payload.hotelId,
             startDate: payload.startDate,
             endDate: payload.endDate,
         };
-        return this.executePost('/data', aiosellPayload);
+        return this.executePost('/data', providerPayload);
     }
 
     async fetchRates(payload: InternalFetchDto): Promise<any> {
-        const aiosellPayload = {
+        const providerPayload = {
             type: 'rates',
             hotelCode: payload.hotelId,
             startDate: payload.startDate,
             endDate: payload.endDate,
         };
-        return this.executePost('/data', aiosellPayload);
+        return this.executePost('/data', providerPayload);
     }
 
     async fetchReservations(payload: InternalFetchDto): Promise<any> {
-        const aiosellPayload = {
+        const providerPayload = {
             type: 'reservation',
             hotelCode: payload.hotelId,
             startDate: payload.startDate,
             endDate: payload.endDate,
         };
-        return this.executePost('/data', aiosellPayload);
+        return this.executePost('/data', providerPayload);
     }
 
     async pushNoShow(payload: InternalNoShowDto): Promise<any> {
         // No-show API uses a different URL structure (no {pms} slug)
         const url = `${this.baseUrl}/noshow`;
 
-        // The payload uses hotelId (not hotelCode) as per Aiosell spec
-        const aiosellPayload = {
+        // The payload uses hotelId (not hotelCode) as per provider spec
+        const providerPayload = {
             hotelId: payload.hotelId,
             bookingId: payload.bookingId,
             partner: payload.partner,
         };
 
-        return this.executePostWithoutSlug('/noshow', aiosellPayload);
+        return this.executePostWithoutSlug('/noshow', providerPayload);
     }
 
     private async executePostWithoutSlug(endpoint: string, payload: any): Promise<any> {
@@ -180,7 +180,7 @@ export class AiosellAdapterService implements IChannelManagerAdapter {
             throw new InternalServerErrorException(response.data.message);
         } catch (error: any) {
             const errorMsg = error.response?.data?.message || error.message;
-            throw new InternalServerErrorException(`Aiosell Error: ${errorMsg}`);
+            throw new InternalServerErrorException(`provider Error: ${errorMsg}`);
         }
     }
 
@@ -198,7 +198,7 @@ export class AiosellAdapterService implements IChannelManagerAdapter {
             throw new InternalServerErrorException(response.data.message);
         } catch (error: any) {
             const errorMsg = error.response?.data?.message || error.message;
-            throw new InternalServerErrorException(`Aiosell Error: ${errorMsg}`);
+            throw new InternalServerErrorException(`provider Error: ${errorMsg}`);
         }
     }
 
@@ -221,8 +221,8 @@ export class AiosellAdapterService implements IChannelManagerAdapter {
             return response.data;
         } catch (error: any) {
             const errorMsg = error.response?.data?.message || error.message;
-            console.error('Aiosell property details fetch failed:', errorMsg);
-            throw new InternalServerErrorException(`Aiosell Error: ${errorMsg}`);
+            console.error('provider property details fetch failed:', errorMsg);
+            throw new InternalServerErrorException(`provider Error: ${errorMsg}`);
         }
     }
 }

@@ -1,11 +1,11 @@
 import { Controller } from '@nestjs/common';
 import { EventPattern, Payload, Ctx, KafkaContext } from '@nestjs/microservices';
-import { AiosellAdapterService } from '../aiosell/services/aiosell-adapter.service';
-import { InternalRatePushPayloadDto } from '../aiosell/dto/internal-rate.dto';
+import { providerAdapterService } from '../provider/services/provider-adapter.service';
+import { InternalRatePushPayloadDto } from '../provider/dto/internal-rate.dto';
 
 @Controller()
 export class RateConsumer {
-  constructor(private readonly aiosellService: AiosellAdapterService) {}
+  constructor(private readonly providerService: providerAdapterService) {}
 
   @EventPattern('rate-updates')
   async handleRateUpdate(@Payload() message: any, @Ctx() context: KafkaContext) {
@@ -23,9 +23,9 @@ export class RateConsumer {
       console.log(`[RateConsumer] Batch size: ${payload.updates.length} date ranges`);
 
       // Call the SAME service that TestController uses
-      const result = await this.aiosellService.pushRates(payload);
+      const result = await this.providerService.pushRates(payload);
 
-      console.log(`[RateConsumer] Successfully pushed rates to Aiosell`);
+      console.log(`[RateConsumer] Successfully pushed rates to provider`);
       return result; // Success → commits offset
     } catch (error: any) {
       console.error(`[RateConsumer] Failed to process rate update: ${error.message}`);
