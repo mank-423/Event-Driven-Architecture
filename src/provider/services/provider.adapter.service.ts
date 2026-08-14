@@ -20,11 +20,11 @@ export class providerAdapterService implements IChannelManagerAdapter {
         private readonly httpService: HttpService,
         private readonly configService: ConfigService,
     ) {
-        this.baseUrl = this.configService.get<string>('provider_BASE_URL')!;
-        this.partnerId = this.configService.get<string>('provider_PARTNER_ID')!;
+        this.baseUrl = this.configService.get<string>('BASE_URL')!;
+        this.partnerId = this.configService.get<string>('PARTNER_ID')!;
 
-        const username = this.configService.get<string>('provider_USERNAME')!;
-        const password = this.configService.get<string>('provider_PASSWORD')!;
+        const username = this.configService.get<string>('USERNAME')!;
+        const password = this.configService.get<string>('PASSWORD')!;
         this.authHeader = `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`;
     }
 
